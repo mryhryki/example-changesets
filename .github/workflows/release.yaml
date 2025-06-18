@@ -1,0 +1,37 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # リポジトリの内容を更新する権限
+      pull-requests: write  # プルリクエストを作成する権限
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      # - name: Install Dependencies
+      #   run: npm install
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # バージョンアップとChangelog更新を行い、リリースPRを作成する
+          # npmへの公開とGitHub Release作成もこのアクションが行う
+          publish: npm run release
+          commit: "chore: release packages"
+          title: "chore: release packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
