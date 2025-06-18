@@ -1,5 +1,11 @@
 # release-unit-1
 
+## 0.0.2
+
+### Patch Changes
+
+- de462d2: Version up test
+
 ## 0.0.1
 
 ### Patch Changes
