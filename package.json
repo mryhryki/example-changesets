@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "init": "npx @changesets/cli init",
-    "add": "npx @changesets/cli"
+    "add": "npx @changesets/cli",
+    "version": "npx @changesets/cli version"
   },
   "workspaces": [
     "units/*"
