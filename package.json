@@ -5,15 +5,18 @@
   "author": "mryhryki",
   "type": "module",
   "scripts": {
-    "init": "npx @changesets/cli init",
-    "add": "npx @changesets/cli",
-    "version": "npx @changesets/cli version",
-    "release": "npx @changesets/cli release"
+    "init": "changesets init",
+    "add": "changesets",
+    "version": "changesets version",
+    "release": "changesets release"
   },
   "workspaces": [
     "units/*"
   ],
   "volta": {
     "node": "24.2.0"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.29.4"
   }
 }
