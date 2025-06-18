@@ -5,10 +5,10 @@
   "author": "mryhryki",
   "type": "module",
   "scripts": {
-    "init": "changesets init",
-    "add": "changesets",
-    "version": "changesets version",
-    "release": "changesets release"
+    "init": "changeset init",
+    "add": "changeset",
+    "version": "changeset version",
+    "release": "changeset tag"
   },
   "workspaces": [
     "units/*"
