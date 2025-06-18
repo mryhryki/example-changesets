@@ -1,0 +1,8 @@
+{
+  "name": "release-unit-1",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "author": "mryhryki",
+  "type": "module"
+}

@@ -5,6 +5,13 @@
   "author": "mryhryki",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "init": "npx @changesets/cli init",
+    "add": "npx @changesets/cli"
+  },
+  "workspaces": [
+    "units/*"
+  ],
+  "volta": {
+    "node": "24.2.0"
   }
 }
