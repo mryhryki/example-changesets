@@ -7,7 +7,8 @@
   "scripts": {
     "init": "npx @changesets/cli init",
     "add": "npx @changesets/cli",
-    "version": "npx @changesets/cli version"
+    "version": "npx @changesets/cli version",
+    "release": "npx @changesets/cli release"
   },
   "workspaces": [
     "units/*"
