@@ -25,13 +25,6 @@ jobs:
         run: npm ci
 
       - name: Create Release Pull Request
-        id: changesets
         uses: changesets/action@v1
-        with:
-          # バージョンアップとChangelog更新を行い、リリースPRを作成する
-          # npmへの公開とGitHub Release作成もこのアクションが行う
-          publish: npm run release
-          commit: "chore: release packages"
-          title: "chore: release packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
