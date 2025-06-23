@@ -8,7 +8,6 @@ on:
 
 jobs:
   delivery:
-    name: Release
     runs-on: ubuntu-latest
     permissions:
       contents: write

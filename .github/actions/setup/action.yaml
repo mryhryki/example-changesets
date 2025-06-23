@@ -9,4 +9,4 @@ runs:
         node-version: '22.x'
     - name: Install dependencies
       shell: bash
-      run: pnpm install
+      run: npm install

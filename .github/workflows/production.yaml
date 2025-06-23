@@ -4,10 +4,10 @@ on:
   push:
     tags:
       - v*.*.*
+  workflow_dispatch:
 
 jobs:
   delivery:
-    name: Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
