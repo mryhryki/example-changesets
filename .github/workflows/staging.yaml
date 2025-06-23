@@ -16,7 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
 
-      # TODO: Check branch name rule
+      # TODO: Update release-drafter.yml
+      - uses: release-drafter/release-drafter@v6
 
       # Dummy
       - run: sleep 0.1

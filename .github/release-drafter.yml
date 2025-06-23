@@ -1,0 +1,6 @@
+# The labels for the release are dynamically inserted here by `update-release-drafter.mjs`.
+
+template: |
+  ## What’s Changed
+
+  $CHANGES
