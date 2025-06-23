@@ -18,4 +18,5 @@ jobs:
 
       # TODO: Check branch name rule
 
-      # TODO
+      # Dummy
+      - run: sleep 0.1

@@ -1,22 +1,18 @@
-name: production
+name: pull-request
 
 on:
-  push:
-    tags:
-      - v*.*.*
-  workflow_dispatch:
+  pull_request:
+    branches: [ "*" ]
 
 jobs:
   delivery:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
+      issues: write # For creating labels
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - uses: actions/labeler@v5
 
-      # TODO: Check tag name rule
-
-      # Dummy
-      - run: sleep 0.1

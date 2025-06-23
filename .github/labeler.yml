@@ -1,0 +1,12 @@
+units/release-unit-1:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'units/release-unit-1/**'
+units/release-unit-2:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'units/release-unit-2/**'
+units/release-unit-3:
+- changed-files:
+  - any-glob-to-any-file:
+    - 'units/release-unit-3/**'
