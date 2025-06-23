@@ -1,0 +1,7 @@
+- changed-files:
+    - release-unit-1:
+        - 'release/unit-1/**'
+    - release-unit-2:
+        - 'release/unit-2/**'
+    - release-unit-3:
+        - 'release/unit-3/**'

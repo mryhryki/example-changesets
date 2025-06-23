@@ -1,0 +1,17 @@
+name: pull-request
+
+on:
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - uses: actions/labeler@v5
+
