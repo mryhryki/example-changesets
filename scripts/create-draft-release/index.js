@@ -9,10 +9,11 @@ import {
 } from './getInfo.js';
 
 const main = async () => {
+  // e.g. 'release-unit-1
   const target = getTarget();
+  // e.g. 'v1.2.3
   const nextVersion = getNextVersion();
   const head = getCommitHash();
-
   console.log(`Target: ${target}, Next Version: ${nextVersion}, Head: ${head}`);
 
   const latestTag = await findLatestTag(target);
@@ -20,10 +21,10 @@ const main = async () => {
     console.log(`Found latest tag for ${target}: ${latestTag}`);
   }
 
-  const currentVersion = latestTag.substring(`${target}@v`.length) ?? '0.0.0';
+  const currentVersion = latestTag?.substring(`${target}@`.length) ?? 'v0.0.0';
   console.log(`Current version: ${currentVersion}`);
 
-  const nextTag = `${target}@v${nextVersion}`;
+  const nextTag = `${target}@${nextVersion}`;
   console.log(`Next version: ${nextVersion}, Next tag: ${nextTag}`);
 
   const commits = await getTargetCommits(latestTag, head);
