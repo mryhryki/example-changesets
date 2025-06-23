@@ -1,0 +1,22 @@
+name: production
+
+on:
+  push:
+    branches:
+      - release/*/v*.*  # Matches release branches like release/{unit directory}/v1.0.0
+  workflow_dispatch:
+
+jobs:
+  delivery:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      # TODO: Check branch name rule
+
+      # TODO
