@@ -5,7 +5,7 @@
   "author": "mryhryki",
   "type": "module",
   "scripts": {
-    "release:draft": "node ./scripts/release-draft.js"
+    "release:draft": "node ./scripts/create-draft-release/index.js"
   },
   "workspaces": [
     "units/*"
