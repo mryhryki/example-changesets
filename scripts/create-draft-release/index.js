@@ -17,8 +17,11 @@ const main = async () => {
   console.log(`Target: ${target}, Next Version: ${nextVersion}, Head: ${head}`);
 
   const latestTag = await findLatestTag(target);
+  const isNew = latestTag == null;
   if (latestTag != null) {
     console.log(`Found latest tag for ${target}: ${latestTag}`);
+  } else {
+    console.log(`Latest tag for ${target} not found`);
   }
 
   const currentVersion = latestTag?.substring(`${target}@`.length) ?? 'v0.0.0';
@@ -27,15 +30,16 @@ const main = async () => {
   const nextTag = `${target}@${nextVersion}`;
   console.log(`Next version: ${nextVersion}, Next tag: ${nextTag}`);
 
-  const commits = await getTargetCommits(latestTag, head);
-  console.log(`Found ${commits.length} commits between ${latestTag}...${head}`);
-
-  const pullRequests = await getPullRequests(commits.map((commit) => commit.sha), target);
-  const releaseNote = [
-    'What\'s Changed',
-    '',
-    ...pullRequests.map((msg) => `- ${msg}`),
-  ].join('\n');
+  const releaseNote = isNew ? 'Initial Release :tada:' : await (async () => {
+    const commits = await getTargetCommits(latestTag, head);
+    console.log(`Found ${commits.length} commits between ${latestTag}...${head}`);
+    const pullRequests = await getPullRequests(commits.map((commit) => commit.sha), target);
+    return [
+      '## What\'s Changed',
+      '',
+      ...pullRequests.map((msg) => `- ${msg}`),
+    ].join('\n');
+  })();
 
   const viewUrl = await createDraftRelease({
     tagName: nextTag,
