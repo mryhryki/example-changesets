@@ -17,6 +17,8 @@ jobs:
       - uses: ./.github/actions/setup
       - run: node ./.github/scripts/create-release-drafter-yaml.mjs
       - uses: release-drafter/release-drafter@v6
+        with:
+          disable-autolabeler: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
