@@ -1,6 +1,1 @@
-# The labels for the release are dynamically inserted here by `update-release-drafter.mjs`.
-
-template: |
-  ## What’s Changed
-
-  $CHANGES
+# The file is override here by `create-release-drafter-yaml.mjs`.
