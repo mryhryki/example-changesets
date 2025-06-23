@@ -4,10 +4,10 @@ on:
   push:
     tags:
       - v*.*.*
+  workflow_dispatch:
 
 jobs:
   delivery:
-    name: Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,4 +18,5 @@ jobs:
 
       # TODO: Check tag name rule
 
-      # TODO
+      # Dummy
+      - run: sleep 0.1
