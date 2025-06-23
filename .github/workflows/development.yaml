@@ -1,0 +1,19 @@
+name: development
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  delivery:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      # TODO
