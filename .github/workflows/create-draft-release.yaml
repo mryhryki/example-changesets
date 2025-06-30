@@ -4,62 +4,97 @@ on:
   workflow_dispatch:
     inputs:
       previous_release_tag:
-        description: "Rule: {Worker ID}@{Version}"
+        description: "Previous Release Tag ({Unit ID}@{Version})"
+        required: true
+      next_release_tag:
+        description: "Next Release Tag ({Unit ID}@{Version})"
         required: true
 
 jobs:
-  delivery:
+  create-draft-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
       - id: extract
         run: |
+          set -xe
+
           if [[ "${GITHUB_REF_TYPE}" != "branch" ]]; then
             echo "This workflow only runs on a branch."
             exit 1
           fi
+
           PREFIX="$(echo "${GITHUB_REF_NAME}"  | cut -d'/' -f 1)"
-          WORKER="$(echo "${GITHUB_REF_NAME}"  | cut -d'/' -f 2)"
+          UNIT="$(echo "${GITHUB_REF_NAME}"  | cut -d'/' -f 2)"
           VERSION="$(echo "${GITHUB_REF_NAME}" | cut -d'/' -f 3)"
+
           if [[ "${PREFIX}" != "release" ]]; then
             echo "This workflow only runs on the release branch."
             exit 1
           fi
-          if [[ ! -d "workers/${WORKER}/" ]]; then
-            echo "The worker '${WORKER}' does not exist."
+          if [[ ! -d "./units/${UNIT}/" ]]; then
+            echo "The unit '${UNIT}' does not exist."
             exit 1
           fi
-          echo "worker_id=${WORKER}"                   >> $GITHUB_OUTPUT
-          echo "worker_directory=./workers/${WORKER}/" >> $GITHUB_OUTPUT
-          echo "branch_version=${VERSION}"             >> $GITHUB_OUTPUT
+          echo "unit_id=${UNIT}"                 >> $GITHUB_OUTPUT
+          echo "unit_directory=./units/${UNIT}/" >> $GITHUB_OUTPUT
+          echo "branch_version=${VERSION}"       >> $GITHUB_OUTPUT
 
-      - id: check_tag
+      - name: Check previous_release_tag
         run: |
-          worker="$(echo "${PREVIOUS_RELEASE_TAG}"  | cut -d'@' -f 1)"
-          version="$(echo "${PREVIOUS_RELEASE_TAG}" | cut -d'@' -f 2)"
-          if [[ "${worker}" != "${WORKER_ID}" ]]; then
-            echo "The worker ID in the tag does not match the worker ID in the branch."
+          set -xe
+          set -o pipefail
+
+          unit="$(echo "${PREVIOUS_RELEASE_TAG}"  | cut -d'@' -f 1)"
+          if [[ "${unit}" != "${UNIT_ID}" ]]; then
+            echo "The unit ID in the tag does not match the unit ID in the branch."
             exit 1
           fi
+        env:
+          UNIT_ID: ${{ steps.extract.outputs.unit_id }}
+          PREVIOUS_RELEASE_TAG: ${{ github.event.inputs.previous_release_tag }}
+
+      - name: Check next_release_tag
+        run: |
+          set -xe
+          set -o pipefail
+
+          unit="$(echo "${NEXT_RELEASE_TAG}"  | cut -d'@' -f 1)"
+          version="$(echo "${NEXT_RELEASE_TAG}" | cut -d'@' -f 2)"
+
+          if [[ "${unit}" != "${UNIT_ID}" ]]; then
+            echo "The unit ID in the tag does not match the unit ID in the branch."
+            exit 1
+          fi
+
           if [[ "${version%.*}" != "${BRANCH_VERSION}" ]]; then
             echo "The main and minor version in the tag does not match the version in the branch."
             exit 1
           fi
         env:
-          WORKER_ID: ${{ steps.extract.outputs.worker_id }}
-          PREVIOUS_RELEASE_TAG: ${{ github.event.inputs.previous_release_tag }}
+          UNIT_ID: ${{ steps.extract.outputs.unit_id }}
+          NEXT_RELEASE_TAG: ${{ github.event.inputs.next_release_tag }}
           BRANCH_VERSION: ${{ steps.extract.outputs.branch_version }}
 
-      - name: Create Release Note
+
+      - name: Create a Release Note
         run: |
+          set -xe
+          set -o pipefail
+
           mkdir -p "./temp/"
           JSON_LINES_FILE="./temp/commits.jsonl"
           RELEASE_NOTE_FILE="./temp/release-notes.md"
 
-          git log "${PREVIOUS_REF}..${TARGET_REF}" --oneline --format="%H %s" -- "${WORKER_DIRECTORY}" |
+          git fetch
+          git fetch --tags origin
+          git log -n 1 "${PREVIOUS_REF}"
+          git log -n 1 "${TARGET_REF}"
+
+          git log "${PREVIOUS_REF}..${TARGET_REF}" --oneline --format="%H %s" -- "${UNIT_DIRECTORY}" |
             cut -d' ' -f 1 |
             while read -r COMMIT; do
               echo "Processing commit: ${COMMIT}"
@@ -67,12 +102,14 @@ jobs:
             done
           jq -r '.[] | ("* " + .title + " by " + .author.login + " in " + .url)' "${JSON_LINES_FILE}" | sort -u > "${RELEASE_NOTE_FILE}"
         env:
+          GH_TOKEN: ${{ github.token }}
           PREVIOUS_REF: ${{ github.event.inputs.previous_release_tag }}
           TARGET_REF: ${{ github.ref_name }}
-          WORKER_DIRECTORY: ${{ steps.extract.outputs.worker_directory }}
+          UNIT_DIRECTORY: ${{ steps.extract.outputs.unit_directory }}
 
       - name: Create a Draft Release
         run: |
+          set -xe
           gh release create "${TAG_VERSION}" \
             --draft \
             --latest \
@@ -80,6 +117,13 @@ jobs:
             --notes-file "./temp/release-notes.md" \
             --target "${TARGET_REF}"
         env:
-          TAG_VERSION: ${{ github.event.inputs.previous_release_tag }}
-          TARGET_REF: ${{ github_ref_name }}
+          GH_TOKEN: ${{ github.token }}
+          TAG_VERSION: ${{ github.event.inputs.next_release_tag }}
+          TARGET_REF: ${{ github.ref_name }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: "./temp/"
+          retention-days: 1
 
