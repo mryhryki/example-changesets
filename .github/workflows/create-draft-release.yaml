@@ -103,7 +103,7 @@ jobs:
             while read -r COMMIT; do
               gh pr list --search "${COMMIT}" --state merged --json 'author,title,url' >> "${JSON_LINES_FILE}"
             done
-          jq -r '.[] | ("* " + .title + " by " + .author.login + " in " + .url)' "${JSON_LINES_FILE}" | sort -u > "${RELEASE_NOTE_FILE}"
+          jq -r '.[] | ("* " + .title + " by @" + .author.login + " in " + .url)' "${JSON_LINES_FILE}" | sort -u > "${RELEASE_NOTE_FILE}"
         env:
           GH_TOKEN: ${{ github.token }}
           PREVIOUS_REF: ${{ github.event.inputs.previous_release_tag }}
