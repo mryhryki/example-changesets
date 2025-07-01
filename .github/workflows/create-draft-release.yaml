@@ -21,7 +21,6 @@ jobs:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
 
-
       - id: extract
         run: |
           set -xe
@@ -82,7 +81,6 @@ jobs:
           UNIT_ID: ${{ steps.extract.outputs.unit_id }}
           NEXT_RELEASE_TAG: ${{ github.event.inputs.next_release_tag }}
           BRANCH_VERSION: ${{ steps.extract.outputs.branch_version }}
-
 
       - name: Create a Release Note
         run: |
