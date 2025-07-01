@@ -4,17 +4,10 @@
   "license": "MIT",
   "author": "mryhryki",
   "type": "module",
-  "scripts": {
-    "release:draft": "node ./scripts/create-draft-release/index.js"
-  },
   "workspaces": [
     "units/*"
   ],
   "volta": {
     "node": "24.2.0"
-  },
-  "dependencies": {
-    "@octokit/rest": "^22.0.0",
-    "semver": "^7.7.2"
   }
 }
