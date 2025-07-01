@@ -89,7 +89,10 @@ jobs:
           set -xe
           set -o pipefail
 
-          JSON_LINES_FILE="./temp/commits.jsonl"
+          mkdir -p "./temp/"
+          PULL_REQUEST_FILE="./temp/pull_request.json"
+          PULL_REQUEST_LIST_FILE="./temp/pull_requests.jsonl"
+          COMMITS_WITHOUT_PR_FILE="./temp/commits_without_pr.txt"
           RELEASE_NOTE_FILE="./temp/release-notes.md"
           
           mkdir -p "./temp/"
@@ -98,12 +101,29 @@ jobs:
           git log -n 1 "${PREVIOUS_REF}"
           git log -n 1 "${TARGET_REF}"
 
-          git log "${PREVIOUS_REF}..${TARGET_REF}" --oneline --format="%H %s" -- "${UNIT_DIRECTORY}" |
+          git log "${PREVIOUS_REF}..${TARGET_REF}" --oneline --format="%H %s by %an" -- "${UNIT_DIRECTORY}" |
             cut -d' ' -f 1 |
             while read -r COMMIT; do
-              gh pr list --search "${COMMIT}" --state merged --json 'author,title,url' >> "${JSON_LINES_FILE}"
+              gh pr list --search "${COMMIT}" --state merged --json 'author,title,url' > "${PULL_REQUEST_FILE}"
+              if [[ "$(jq -r '.[]' "${PULL_REQUEST_FILE}")" == "" ]]; then
+                echo "${COMMIT}" | sed -E 's/^/* /g' >> "${COMMITS_WITHOUT_PR_FILE}"
+              else
+                cat "${PULL_REQUEST_FILE}" >> "${PULL_REQUEST_LIST_FILE}"
+              fi
             done
-          jq -r '.[] | ("* " + .title + " by @" + .author.login + " in " + .url)' "${JSON_LINES_FILE}" | sort -u > "${RELEASE_NOTE_FILE}"
+          printf "## Pull Requests\n\n"                  >  "${RELEASE_NOTE_FILE}"
+          if [[ -f "${PULL_REQUEST_LIST_FILE}" ]]; then
+            jq -r '.[] | ("* " + .title + " by " + .author.login + " in " + .url)' "${PULL_REQUEST_LIST_FILE}" |
+                                                 sort -u >> "${RELEASE_NOTE_FILE}"
+          else
+            echo "(No Pull Requests)"                    >> "${RELEASE_NOTE_FILE}"
+          fi
+          printf "\n## Commits without Pull Request\n\n" >> "${RELEASE_NOTE_FILE}"
+          if [[ -f "${COMMITS_WITHOUT_PR_FILE}" ]]; then
+            cat "${COMMITS_WITHOUT_PR_FILE}"             >> "${RELEASE_NOTE_FILE}"
+          else
+            echo "(No Commits without Pull Request)"     >> "${RELEASE_NOTE_FILE}"
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
           PREVIOUS_REF: ${{ github.event.inputs.previous_release_tag }}
