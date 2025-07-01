@@ -94,6 +94,9 @@ jobs:
           PULL_REQUEST_LIST_FILE="./temp/pull_requests.jsonl"
           COMMITS_WITHOUT_PR_FILE="./temp/commits_without_pr.txt"
           RELEASE_NOTE_FILE="./temp/release-notes.md"
+          
+          mkdir -p "./temp/"
+          touch "${JSON_LINES_FILE}"
 
           git log -n 1 "${PREVIOUS_REF}"
           git log -n 1 "${TARGET_REF}"
