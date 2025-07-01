@@ -17,6 +17,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
 
       - id: extract
         run: |
@@ -89,15 +93,12 @@ jobs:
           JSON_LINES_FILE="./temp/commits.jsonl"
           RELEASE_NOTE_FILE="./temp/release-notes.md"
 
-          git fetch
-          git fetch --tags origin
           git log -n 1 "${PREVIOUS_REF}"
           git log -n 1 "${TARGET_REF}"
 
           git log "${PREVIOUS_REF}..${TARGET_REF}" --oneline --format="%H %s" -- "${UNIT_DIRECTORY}" |
             cut -d' ' -f 1 |
             while read -r COMMIT; do
-              echo "Processing commit: ${COMMIT}"
               gh pr list --search "${COMMIT}" --state merged --json 'author,title,url' >> "${JSON_LINES_FILE}"
             done
           jq -r '.[] | ("* " + .title + " by " + .author.login + " in " + .url)' "${JSON_LINES_FILE}" | sort -u > "${RELEASE_NOTE_FILE}"
