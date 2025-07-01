@@ -97,11 +97,11 @@ jobs:
           git log -n 1 "${TARGET_REF}"
 
           git log "${PREVIOUS_REF}..${TARGET_REF}" --oneline --format="%H %s by %an" -- "${UNIT_DIRECTORY}" |
-            cut -d' ' -f 1 |
-            while read -r COMMIT; do
+            while read -r LOG; do
+              COMMIT="$(echo -n "${LOG}" | cut -d' ' -f 1)"
               gh pr list --search "${COMMIT}" --state merged --json 'author,title,url' > "${PULL_REQUEST_FILE}"
               if [[ "$(jq -r '.[]' "${PULL_REQUEST_FILE}")" == "" ]]; then
-                echo "${COMMIT}" | sed -E 's/^/* /g' >> "${COMMITS_WITHOUT_PR_FILE}"
+                echo "${LOG}" | sed -E 's/^/* /g' >> "${COMMITS_WITHOUT_PR_FILE}"
               else
                 cat "${PULL_REQUEST_FILE}" >> "${PULL_REQUEST_LIST_FILE}"
               fi
