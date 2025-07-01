@@ -89,9 +89,11 @@ jobs:
           set -xe
           set -o pipefail
 
-          mkdir -p "./temp/"
           JSON_LINES_FILE="./temp/commits.jsonl"
           RELEASE_NOTE_FILE="./temp/release-notes.md"
+          
+          mkdir -p "./temp/"
+          touch "${JSON_LINES_FILE}"
 
           git log -n 1 "${PREVIOUS_REF}"
           git log -n 1 "${TARGET_REF}"
